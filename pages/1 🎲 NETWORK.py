@@ -6,6 +6,8 @@ import streamlit as st
 from streamlit_modal import Modal
 import streamlit.components.v1 as components
 
+from utils.detailed_page import make_popup
+
 
 
 st.markdown("# Main page")
@@ -28,21 +30,6 @@ tab1.line_chart(data)
 tab2.subheader("A tab with the data")
 tab2.write(data)
 
+#Pop-up Module, to be modified to use Game_ID as an input
+make_popup("Halli Galli")
 
-modal = Modal("Halli Galli","mode")
-open_modal = st.button("Open")
-if open_modal:
-    modal.open()
-
-if modal.is_open():
-    with modal.container():
-        col1,col2 = st.columns([1,2])
-
-        with col1:
-            st.image("https://cf.geekdo-images.com/kxYYgRlwM1NbHJHp62FLqg__opengraph/img/mbR9g_6T0kOKF1Me6ig6rWDJvX8=/fit-in/1200x630/filters:strip_icc()/pic458934.jpg")
-
-        with col2:
-            st.write("- Players : 2-6 players")
-
-        st.write("Some fancy text")
-        value = st.checkbox("Check me")

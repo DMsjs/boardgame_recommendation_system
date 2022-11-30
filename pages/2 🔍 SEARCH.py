@@ -1,35 +1,37 @@
 import streamlit as st
-import streamlit_wordcloud as wordcloud
+
+from utils.detailed_page import detailed_page
+
+
+def select_game(input_dict):
+    col_list = st.columns(len(input_dict.keys()))
+    button_list = []
+    for col_idx in range(len(input_dict.keys())):
+        with col_list[col_idx]:
+            button_list.append(st.button(list(input_dict.keys())[col_idx]))
+
+    for i,button in enumerate(button_list):
+        if button:
+            st.session_state['button'] = i
+        else:pass
+
+    return st.session_state['button']
+
+
 
 st.markdown("# Search Page")
 
 st.text_input('Enter search words:',"halli galli")
 
+#Seasrch Result Example
+input_dict = {"Halli Galli":"id1","Monopoly":"id2","Rumi Cube":"id3","Clue":"id4","Scrabble":"id5"}
 
-st.markdown("## Halli Galli")
-col1,col2 = st.columns([1,2])
+session= select_game(input_dict)
 
-with col1:
-   st.image("https://cf.geekdo-images.com/kxYYgRlwM1NbHJHp62FLqg__opengraph/img/mbR9g_6T0kOKF1Me6ig6rWDJvX8=/fit-in/1200x630/filters:strip_icc()/pic458934.jpg")
+game_name = list(input_dict.keys())[session]
+game_id = input_dict[game_name]
 
-with col2:
-   st.write("- Players : 2-6 players")
-
+#game_name => game_id
+detailed_page(game_name)
 
 
-words = [
-    dict(text="Robinhood", value=16000, color="#b5de2b", country="US", industry="Cryptocurrency"),
-    dict(text="Personio", value=8500, color="#b5de2b", country="DE", industry="Human Resources"),
-    dict(text="Boohoo", value=6700, color="#b5de2b", country="UK", industry="Beauty"),
-    dict(text="Deliveroo", value=13400, color="#b5de2b", country="UK", industry="Delivery"),
-    dict(text="SumUp", value=8300, color="#b5de2b", country="UK", industry="Credit Cards"),
-    dict(text="CureVac", value=12400, color="#b5de2b", country="DE", industry="BioPharma"),
-    dict(text="Deezer", value=10300, color="#b5de2b", country="FR", industry="Music Streaming"),
-    dict(text="Eurazeo", value=31, color="#b5de2b", country="FR", industry="Asset Management"),
-    dict(text="Drift", value=6000, color="#b5de2b", country="US", industry="Marketing Automation"),
-    dict(text="Twitch", value=4500, color="#b5de2b", country="US", industry="Social Media"),
-    dict(text="Plaid", value=5600, color="#b5de2b", country="US", industry="FinTech"),
-]
-return_obj = wordcloud.visualize(words, tooltip_data_fields={
-    'text':'Company', 'value':'Mentions', 'country':'Country of Origin', 'industry':'Industry'
-}, per_word_coloring=False)
