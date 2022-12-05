@@ -12,6 +12,9 @@ ipykernel = "*"
 jupyter = "*"
 requests = "*"
 pyarrow = "*"
+fuzzywuzzy = "*"
+streamlit-modal = "*"
+streamlit-wordcloud = "*"
 
 [dev-packages]
 ipykernel = "*"
