@@ -129,6 +129,4 @@ dmypy.json
 .pyre/
 
 # Data
-data/bgg-15m-reviews.csv
-data/bgg-19m-reviews.csv
-data/games_detailed_info.csv
+data/
