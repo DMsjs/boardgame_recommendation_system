@@ -35,11 +35,12 @@ def id_name_df():
     """
     게임 id, name에 대한 dataframe 반환
     """
-    id_list = requests.get('http://127.0.0.1:5000/game_list?mode=all').json()
-    name_list = []
-    for id in id_list:
-        name_list.append(requests.get('http://127.0.0.1:5000/api?data-source=basic-data-new&game-id='+str(id)+'&content=Name').text)
-    result_df = pd.DataFrame({'id':id_list, 'name':name_list})
+    # id_list = requests.get('http://127.0.0.1:5000/game_list?mode=all').json()
+    # name_list = []
+    # for id in id_list:
+    #     name_list.append(requests.get('http://127.0.0.1:5000/api?data-source=basic-data-new&game-id='+str(id)+'&content=Name').text)
+    name_id_dict = requests.get('http://127.0.0.1:5000/name_id_dict?mode=name-id').json()
+    result_df = pd.DataFrame({'id':list(name_id_dict.values()), 'name':list(name_id_dict.keys())})
     
     return result_df
 
@@ -47,15 +48,16 @@ def id_name_dict():
     """
     {'id':'name'} 형태의 dictinary 반환
     """
-    pass
+    result_dict = requests.get('http://127.0.0.1:5000/name_id_dict?mode=id-name').json()
+    return result_dict
 
 def name_id_dict():
     """
     {'name':'id'} 형태의 dictinary 반환
     """
-    pass
+    result_dict = requests.get('http://127.0.0.1:5000/name_id_dict?mode=name-id').json()
+    return result_dict
 
     
-
 if __name__ == '__main__':
     print(id_name_df())

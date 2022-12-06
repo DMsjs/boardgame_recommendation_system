@@ -1,7 +1,5 @@
 from flask import Flask, request
 from flask import render_template
-# import csv
-from csv import DictReader
 from pyarrow import csv
 
 app = Flask(__name__)
@@ -73,7 +71,7 @@ def get_data():
             return result
 
     else:
-        raise Exception('Error: wrong data source')
+        raise Exception('Error: invalid data source')
 
 def rank_to_int(x):
     if x.isdigit():
@@ -90,4 +88,19 @@ def get_game_list():
         return list(detailed_data['id'])
     elif mode == 'top100':
         return list(detailed_data['id'][detailed_data['Board Game Rank'].apply(rank_to_int)<=100])
+    else:
+        raise Exception('Error: invalid mode')
+
+@app.route('/name_id_dict')
+def get_name_id_dict():
+    args = request.args
+    mode = args.get('mode')
+    df = basic_data_new[['ID','Name']]
+    if mode == 'name-id':
+        return df.set_index('Name').T.to_dict('list')
+    elif mode == 'id-name':
+        return df.set_index('ID').T.to_dict('list')
+    else:
+        raise Exception('Error: invalid mode')
+        
     
