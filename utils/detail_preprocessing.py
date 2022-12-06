@@ -82,11 +82,12 @@ for i in game_raw_data['bayesaverage']:
         nan_bayesaverage_count += 1
 
 # check boardgame Rank # NotRanked=5
+## fix data type (str -> int)
 nan_rank_count = 0
 for i in range(len(game_raw_data['Board Game Rank'])):
-    # item = game_raw_data['Board Game Rank'][i]
-    # if type(item) == str and item != 'Not Ranked':
-    #     game_raw_data['Board Game Rank'][i] = int(item)
+    item = game_raw_data['Board Game Rank'][i]
+    if type(item) == str and item != 'Not Ranked':
+        game_raw_data['Board Game Rank'][i] = int(item)
     item = game_raw_data['Board Game Rank'][i]
     if str(item) == 'nan' or type(item) != int:
         print(f'type: {type(i)} / item: {item}')
