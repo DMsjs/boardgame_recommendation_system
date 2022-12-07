@@ -88,6 +88,8 @@ for i in range(len(game_raw_data['Board Game Rank'])):
     item = game_raw_data['Board Game Rank'][i]
     if type(item) == str and item != 'Not Ranked':
         game_raw_data['Board Game Rank'][i] = int(item)
+    if item == 'Not Ranked':
+        game_raw_data['Board Game Rank'][i] = 99999
     item = game_raw_data['Board Game Rank'][i]
     if str(item) == 'nan' or type(item) != int:
         print(f'type: {type(i)} / item: {item}')
