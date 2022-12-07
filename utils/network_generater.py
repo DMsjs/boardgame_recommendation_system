@@ -47,37 +47,38 @@ class GameNetwork():
             self.category_set.update(self.game_dict[df.iloc[i, 1]].boardgamecategory)
             self.mechanic_set.update(self.game_dict[df.iloc[i, 1]].boardgamemechanic)
             self.family_set.update(self.game_dict[df.iloc[i, 1]].boardgamefamily)
-    def category_network(self):
-        self.category_link = pd.DataFrame({'Source':[], 'Target':[], 'Value':[]})
 
-        # define category <-> label
-        category_to_label = {}
-        label_to_category = {}
-        for i, category in enumerate(self.category_set):
-            category_to_label[category] = i
-            label_to_category[i] = category
+    # def category_network(self):
+    #     self.category_link = pd.DataFrame({'Source':[], 'Target':[], 'Value':[]})
 
-        # define category link
-        for i in tqdm(range(len(self.category_set))):
-            category_name = label_to_category[i]
-            game_in_category = []
-            for game in self.game_dict.keys():
-                game_ojt = self.game_dict[game]
-                if category_name in game_ojt.boardgamecategory:
-                    game_in_category.append(game_ojt.primary)
+    #     # define category <-> label
+    #     category_to_label = {}
+    #     label_to_category = {}
+    #     for i, category in enumerate(self.category_set):
+    #         category_to_label[category] = i
+    #         label_to_category[i] = category
+
+    #     # define category link
+    #     for i in tqdm(range(len(self.category_set))):
+    #         category_name = label_to_category[i]
+    #         game_in_category = []
+    #         for game in self.game_dict.keys():
+    #             game_ojt = self.game_dict[game]
+    #             if category_name in game_ojt.boardgamecategory:
+    #                 game_in_category.append(game_ojt.primary)
               
-            all_pair = list(permutations(game_in_category, 2))
-            for source, target in tqdm(all_pair):
-                self.category_link.loc[len(self.category_link)] = [source, target, 1]
+    #         all_pair = list(permutations(game_in_category, 2))
+    #         for source, target in tqdm(all_pair):
+    #             self.category_link.loc[len(self.category_link)] = [source, target, 1]
 
-        # define category network
-        G = nx.Graph()
-        for game in self.game_dict.keys():
-            G.add_node(game, features=self.game_dict[game])
-        for i in self.category_link.index:
-            G.add_edge(self.category_link['Source'][i],self.category_link['Target'][i])
+    #     # define category network
+    #     G = nx.Graph()
+    #     for game in self.game_dict.keys():
+    #         G.add_node(game, features=self.game_dict[game])
+    #     for i in self.category_link.index:
+    #         G.add_edge(self.category_link['Source'][i],self.category_link['Target'][i])
 
-        return G    
+    #     return G    
     
     def category_tsne(self):
 
@@ -104,6 +105,32 @@ class GameNetwork():
         self.category_tsne_df = pd.DataFrame(tsne_np, columns = ['category_tsne_0', 'category_tsne_1'])
 
         return self.category_tsne_df
+    
+    def mechanic_tsne(self):
+
+        self.mechanic_one_hot_df = self.game_df.copy()
+
+        for mechanic in self.mechanic_set:
+            self.mechanic_one_hot_df[mechanic] = 0
+        for i in range(len(self.mechanic_one_hot_df)):
+
+            if type(self.mechanic_one_hot_df['boardgamemechanic'].iloc[i]) == float:
+                boardgamemechanic = []
+            else:
+                boardgamemechanic = eval(self.mechanic_one_hot_df['boardgamemechanic'].iloc[i])
+
+            for mechanic in boardgamemechanic:
+                self.mechanic_one_hot_df[mechanic][i] = 1
+        
+        self.mechanic_one_hot_df.drop('boardgamecategory', axis=1)
+        self.mechanic_one_hot_df.drop('boardgamemechanic', axis=1)
+        self.mechanic_one_hot_df.drop('boardgamefamily', axis=1)
+        
+        # Tsne
+        tsne_np = TSNE(n_components = 2).fit_transform(self.mechanic_one_hot_df[list(self.mechanic_set)])
+        self.mechanic_tsne_df = pd.DataFrame(tsne_np, columns = ['mechanic_tsne_0', 'mechanic_tsne_1'])
+
+        return self.mechanic_tsne_df
     
     def category_similarity(self, triggers, filter):
         '''
@@ -185,29 +212,33 @@ if __name__ == '__main__':
     # df = df[df['maxplayers']<=8]
     # df = df.reset_index(drop=True)
     game_network = GameNetwork(df)
-    # category_tsne_df = game_network.category_tsne()
-    # game_network.category_one_hot_df['boardgamecategory']
+    mechanic_tsne_df = game_network.mechanic_tsne()
+    game_network.mechanic_one_hot_df['boardgamemechanic']
 
-    # df_concated_tsne = pd.concat([df, category_tsne_df], axis=1)
-    # df_concated_tsne.to_csv('data/tsne_game_info.csv')
+    tsne_df = pd.read_csv('data/tsne_game_info2.csv')
 
-    # import matplotlib.pyplot as plt
+    df_concated_tsne = pd.concat([tsne_df, mechanic_tsne_df], axis=1)
+    df_concated_tsne = df_concated_tsne.drop([ 'Unnamed: 0'], axis=1)
+    df_concated_tsne.reset_index(drop=True)
+    # df_concated_tsne.to_csv('data/tsne_game_info2.csv')
+
+    import matplotlib.pyplot as plt
 
 
-    # # target 별 시각화
-    # plt.scatter(category_tsne_df['component 0'], category_tsne_df['component 1'], color = 'pink')
+    # target 별 시각화
+    plt.scatter(df_concated_tsne['mechanic_tsne_0'], df_concated_tsne['mechanic_tsne_1'], color = 'pink', s=5)
+    plt.scatter(df_concated_tsne['category_tsne_0'], df_concated_tsne['category_tsne_1'], color = 'blue', s=5)
 
 
-    # plt.xlabel('component 0')
-    # plt.ylabel('component 1')
-    # plt.legend()
-    # plt.show()
+    plt.xlabel('component 0')
+    plt.ylabel('component 1')
+    plt.legend()
+    plt.show()
 
 
 
 
     # trigger cossim
-    new_df = pd.concat([df, category_tsne_df], axis=1)
     triggers = ['Puerto Rico', 'Battlestar Galactica: The Board Game', 'Catan']
     # trigger_df = pd.DataFrame()
     # for trigger in triggers:
