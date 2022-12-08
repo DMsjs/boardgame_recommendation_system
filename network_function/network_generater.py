@@ -146,6 +146,7 @@ class GameNetwork():
             'Board Game Rank','averageweight', 'category_tsne_0', 'category_tsne_1']
 
         trigger_df = pd.DataFrame()
+        num_trigger = len(triggers)
         for trigger in triggers:
             trigger_df = pd.concat([trigger_df,self.game_df[self.game_df['primary']==trigger]], axis=0)
 
@@ -156,40 +157,49 @@ class GameNetwork():
             if feature in ['maxplayers', 'playingtime', 'Board Game Rank', 'averageweight']:
                 filtered_game_df = filtered_game_df[filtered_game_df[feature]<=bound[1]]
 
-        filtered_game_df['cossim_trigger1'] = 0.0
-        filtered_game_df['cossim_trigger2'] = 0.0
-        filtered_game_df['cossim_trigger3'] = 0.0
+        # filtered_game_df['cossim_trigger1'] = 0.0
+        # filtered_game_df['cossim_trigger2'] = 0.0
+        # filtered_game_df['cossim_trigger3'] = 0.0
+        for i in range(num_trigger):
+            filtered_game_df[f'cossim_trigger{i}'] = 0.0
 
         for i in range(len(filtered_game_df)):
-            filtered_game_df['cossim_trigger1'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[0, :].apply(float))
-            filtered_game_df['cossim_trigger2'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[1, :].apply(float))
-            filtered_game_df['cossim_trigger3'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[2, :].apply(float))
+            for j in range(num_trigger):
+                filtered_game_df[f'cossim_trigger{j}'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[0, :].apply(float))
+            # filtered_game_df['cossim_trigger1'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[0, :].apply(float))
+            # filtered_game_df['cossim_trigger2'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[1, :].apply(float))
+            # filtered_game_df['cossim_trigger3'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[2, :].apply(float))
 
         
         return filtered_game_df
 
-    def category_recommendation(self, triggers, filter):
+    def category_recommendation(self, triggers, filter, recommend_num):
         cos_sim_df = self.category_similarity(triggers, filter)
-        trigger1_recommend_df = (cos_sim_df.sort_values(by=['cossim_trigger1'], ascending=False)[:10])
-        trigger2_recommend_df = (cos_sim_df.sort_values(by=['cossim_trigger2'], ascending=False)[:10])
-        trigger3_recommend_df = (cos_sim_df.sort_values(by=['cossim_trigger3'], ascending=False)[:10])
+        recommend_df_dict = {}
+        for i in range(len(triggers)):
+            recommend_df_dict[triggers[i]] = cos_sim_df.sort_values(by=[f'cossim_trigger{i}'], ascending=False)[:recommend_num]
+        # trigger1_recommend_df = (cos_sim_df.sort_values(by=['cossim_trigger1'], ascending=False)[:10])
+        # trigger2_recommend_df = (cos_sim_df.sort_values(by=['cossim_trigger2'], ascending=False)[:10])
+        # trigger3_recommend_df = (cos_sim_df.sort_values(by=['cossim_trigger3'], ascending=False)[:10])
 
-        return trigger1_recommend_df, trigger2_recommend_df, trigger3_recommend_df
+        return recommend_df_dict
 
-    def category_recomm_network(self, triggers, filter):
-        trigger1_recommend_df, trigger2_recommend_df, trigger3_recommend_df = self.category_recommendation(triggers, filter)
-        trigger1_recommend_list, trigger2_recommend_list, trigger3_recommend_list = list(trigger1_recommend_df['primary']), list(trigger2_recommend_df['primary']), list(trigger3_recommend_df['primary'])
+    def category_recomm_network(self, triggers, filter, recommend_num):
+        recommend_df_dict = self.category_recommendation(triggers, filter, recommend_num)
 
         # define category recommend network
         recomm_G = nx.Graph()
-        for game in trigger1_recommend_list+trigger2_recommend_list+trigger3_recommend_list:
-            recomm_G.add_node(game, features=self.game_dict[game])
-        for game in trigger1_recommend_list:
-            recomm_G.add_edge(triggers[0],game)
-        for game in trigger2_recommend_list:
-            recomm_G.add_edge(triggers[1],game)
-        for game in trigger3_recommend_list:
-            recomm_G.add_edge(triggers[2],game)
+
+        # add node
+        for game in triggers:
+            print(game)
+            game_info = self.game_dict[game]
+            recomm_G.add_node(game, features=game_info)
+        for trigger in triggers:
+            for game in list(recommend_df_dict[trigger]['primary']):
+                game_info = self.game_dict[game]
+                recomm_G.add_node(game, features=game_info)
+                recomm_G.add_edge(trigger, game)
 
         return recomm_G
 
@@ -203,6 +213,7 @@ class GameNetwork():
 
 
 if __name__ == '__main__':
+    '''
 
     df = pd.read_csv('data/tsne_game_info2.csv')
 
@@ -234,7 +245,7 @@ if __name__ == '__main__':
 
 
     # trigger cossim
-    triggers = ['Puerto Rico', 'Battlestar Galactica: The Board Game', 'Mombasa']
+    triggers = ['Puerto Rico', 'Battlestar Galactica: The Board Game', 'Mombasa', 'Twilight Struggle']
     # trigger_df = pd.DataFrame()
     # for trigger in triggers:
     #     trigger_df = pd.concat([trigger_df,new_df[new_df['primary']==trigger]], axis=0)
@@ -257,7 +268,9 @@ if __name__ == '__main__':
     # temp.sort_values(by=['cossim_trigger3'], ascending=False)['primary'][:10]
 
 
-    recomm_G = game_network.category_recomm_network(triggers=triggers, filter=filter)
+    recomm_G = game_network.category_recomm_network(triggers=triggers, filter=filter, recommend_num=10)
+    # game_network.category_similarity(triggers=triggers, filter=filter)
+
     print(recomm_G.edges())
 
     # net visualize
@@ -266,6 +279,37 @@ if __name__ == '__main__':
     pos = nx.spring_layout(recomm_G, k = 0.15)
     nx.draw_networkx(recomm_G,pos, node_size = 25, node_color = 'blue')
     plt.show()
+    '''
+    ######################
+    
+    '''
+    현종 이 밑으로 따라하면 됨 ㅇㅇㅇㅇ
+    '''
+    # input data 로드(tsne 칼럼 포함)
+    df = pd.read_csv('data/tsne_game_info2.csv')
+    # GameNetwork 객체 생성(게임 정보 및 네트워크 핸들링)
+    game_network = GameNetwork(df)
 
-    # recommend df
-    recomm_df = game_network.category_recommendation(triggers=triggers, filter=filter)
+    '''
+    위에 객체 한번 만들어 놓기만 하면 아래 코드만 반복 실행하면 됨
+    '''
+    # trigger 설정(1, 2, 3개 설정)(사실 4개 이상도 되긴 함)
+    triggers = ['Puerto Rico', 'Battlestar Galactica: The Board Game']
+    # filter 설정
+    filter = {'minplayers': [2, 99999],'maxplayers':[0, 4],'playingtime': [60, 380],'minage':[4, 1000],'bayesaverage':[4,10],'Board Game Rank':[0, 10000],'averageweight':[2, 4]}
+    # 추천 게임 네트워크 도출(GameNetwork 내부 메서드 사용)
+    recomm_G = game_network.category_recomm_network(triggers=triggers, filter=filter, recommend_num=10)
+    # node 출력
+    print(recomm_G.nodes())
+    # edge 출력
+    print(recomm_G.edges())
+
+    # 추천 게임 네트워크 시각화
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(20, 20))
+    pos = nx.spring_layout(recomm_G, k = 0.15)
+    nx.draw_networkx(recomm_G,pos, node_size = 25, node_color = 'blue')
+    plt.show()
+
+
+
