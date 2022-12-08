@@ -142,33 +142,31 @@ class GameNetwork():
         - Board Game Rank
         - averageweight
         '''
-        tsne_df = pd.read_csv('data/tsne_game_info.csv')
-
-
         sim_columns = ['minplayers','maxplayers','playingtime','minage','bayesaverage', \
             'Board Game Rank','averageweight', 'category_tsne_0', 'category_tsne_1']
 
         trigger_df = pd.DataFrame()
         for trigger in triggers:
-            trigger_df = pd.concat([trigger_df,new_df[new_df['primary']==trigger]], axis=0)
+            trigger_df = pd.concat([trigger_df,self.game_df[self.game_df['primary']==trigger]], axis=0)
 
+        filtered_game_df = self.game_df.copy()
         for feature, bound in filter.items():
             if feature in ['minplayers', 'playingtime', 'minage', 'Board Game Rank', 'averageweight']:
-                tsne_df = tsne_df[tsne_df[feature]>=bound[0]]
+                filtered_game_df = filtered_game_df[filtered_game_df[feature]>=bound[0]]
             if feature in ['maxplayers', 'playingtime', 'Board Game Rank', 'averageweight']:
-                tsne_df = tsne_df[tsne_df[feature]<=bound[1]]
+                filtered_game_df = filtered_game_df[filtered_game_df[feature]<=bound[1]]
 
-        tsne_df['cossim_trigger1'] = 0.0
-        tsne_df['cossim_trigger2'] = 0.0
-        tsne_df['cossim_trigger3'] = 0.0
+        filtered_game_df['cossim_trigger1'] = 0.0
+        filtered_game_df['cossim_trigger2'] = 0.0
+        filtered_game_df['cossim_trigger3'] = 0.0
 
-        for i in range(len(tsne_df)):
-            tsne_df['cossim_trigger1'].iloc[i] = cos_sim(tsne_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[0, :].apply(float))
-            tsne_df['cossim_trigger2'].iloc[i] = cos_sim(tsne_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[1, :].apply(float))
-            tsne_df['cossim_trigger3'].iloc[i] = cos_sim(tsne_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[2, :].apply(float))
+        for i in range(len(filtered_game_df)):
+            filtered_game_df['cossim_trigger1'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[0, :].apply(float))
+            filtered_game_df['cossim_trigger2'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[1, :].apply(float))
+            filtered_game_df['cossim_trigger3'].iloc[i] = cos_sim(filtered_game_df[sim_columns].iloc[i].apply(float), trigger_df[sim_columns].iloc[2, :].apply(float))
 
         
-        return tsne_df
+        return filtered_game_df
 
     def category_recommendation(self, triggers, filter):
         cos_sim_df = self.category_similarity(triggers, filter)
@@ -206,40 +204,37 @@ class GameNetwork():
 
 if __name__ == '__main__':
 
-    df = pd.read_csv('data/preprocessed_games_info.csv')
-    # filter
-    # df = df[df['minplayers']>=4]
-    # df = df[df['maxplayers']<=8]
-    # df = df.reset_index(drop=True)
+    df = pd.read_csv('data/tsne_game_info2.csv')
+
     game_network = GameNetwork(df)
-    mechanic_tsne_df = game_network.mechanic_tsne()
-    game_network.mechanic_one_hot_df['boardgamemechanic']
+    # mechanic_tsne_df = game_network.mechanic_tsne()
+    # game_network.mechanic_one_hot_df['boardgamemechanic']
 
-    tsne_df = pd.read_csv('data/tsne_game_info2.csv')
+    # tsne_df = pd.read_csv('data/tsne_game_info2.csv')
 
-    df_concated_tsne = pd.concat([tsne_df, mechanic_tsne_df], axis=1)
-    df_concated_tsne = df_concated_tsne.drop([ 'Unnamed: 0'], axis=1)
-    df_concated_tsne.reset_index(drop=True)
+    # df_concated_tsne = pd.concat([tsne_df, mechanic_tsne_df], axis=1)
+    # df_concated_tsne = df_concated_tsne.drop([ 'Unnamed: 0'], axis=1)
+    # df_concated_tsne.reset_index(drop=True)
     # df_concated_tsne.to_csv('data/tsne_game_info2.csv')
 
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
 
 
-    # target 별 시각화
-    plt.scatter(df_concated_tsne['mechanic_tsne_0'], df_concated_tsne['mechanic_tsne_1'], color = 'pink', s=5)
-    plt.scatter(df_concated_tsne['category_tsne_0'], df_concated_tsne['category_tsne_1'], color = 'blue', s=5)
+    # # target 별 시각화
+    # plt.scatter(df_concated_tsne['mechanic_tsne_0'], df_concated_tsne['mechanic_tsne_1'], color = 'pink', s=5)
+    # plt.scatter(df_concated_tsne['category_tsne_0'], df_concated_tsne['category_tsne_1'], color = 'blue', s=5)
 
 
-    plt.xlabel('component 0')
-    plt.ylabel('component 1')
-    plt.legend()
-    plt.show()
+    # plt.xlabel('component 0')
+    # plt.ylabel('component 1')
+    # plt.legend()
+    # plt.show()
 
 
 
 
     # trigger cossim
-    triggers = ['Puerto Rico', 'Battlestar Galactica: The Board Game', 'Catan']
+    triggers = ['Puerto Rico', 'Battlestar Galactica: The Board Game', 'Mombasa']
     # trigger_df = pd.DataFrame()
     # for trigger in triggers:
     #     trigger_df = pd.concat([trigger_df,new_df[new_df['primary']==trigger]], axis=0)
