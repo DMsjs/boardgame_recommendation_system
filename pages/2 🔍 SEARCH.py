@@ -10,12 +10,24 @@ from PIL import Image
 from io import BytesIO
 import requests
 
+st.set_page_config(page_title='Search', page_icon="🔍")
+
 def search_games(input_string, name_id_dict=name_id_dict()):
-    name_list = list(name_id_dict.keys())
-    results = process.extract(input_string, name_list, limit=5)
-    results_dict = dict()
-    for name,score in results:
-        results_dict[name] = name_id_dict[name]
+    if input_string == '':
+        top5_id_list = requests.get('http://127.0.0.1:5000/game_list?mode=top5').json()
+        results_dict = dict()
+        for id in top5_id_list:
+            game_name = requests.get('http://127.0.0.1:5000/api?data-source=basic-data-new&game-id='+str(id)+'&content=Name').text
+            results_dict[game_name] = [id]
+        st.subheader('Top 5 Games')
+        
+    else:
+        name_list = list(name_id_dict.keys())
+        results = process.extract(input_string, name_list, limit=5)
+        results_dict = dict()
+        for name,score in results:
+            results_dict[name] = name_id_dict[name]
+        st.subheader('Results')
 
     return results_dict
 
@@ -32,8 +44,10 @@ def select_game(input_dict):
                 button_list.append(st.button(label=button_text, key=list(input_dict.keys())[col_idx]))
                 game_id = input_dict[list(input_dict.keys())[col_idx]][0]
                 img_url = requests.get('http://127.0.0.1:5000/api?data-source=detailed-data&game-id='+str(game_id)+'&content=image').text
-                # image_list.append(st.image(img_url))
-                st.image(image=img_url, use_column_width='always')
+                img_response = requests.get(img_url)
+                img = Image.open(BytesIO(img_response.content))
+                resized_img = img.resize((300,400))
+                st.image(image=resized_img, use_column_width='always')
             except:
                 pass
     for i,button in enumerate(button_list):
@@ -50,9 +64,8 @@ def local_css(file_name):
 def remote_css(url):
     st.markdown(f'<link href="{url}" rel="stylesheet">', unsafe_allow_html=True)    
 
-local_css('css/button_style.css')
-remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
-
+local_css('css/style.css')
+# remote_css('https://fonts.googleapis.com/icon?family=Material+Icons')
 
 
 st.markdown("# Search Page")
