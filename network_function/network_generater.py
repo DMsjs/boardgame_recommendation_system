@@ -45,10 +45,10 @@ class GameNetwork():
         self.mechanic_set = set()
         self.family_set = set()
         for i in range(len(df)):
-            self.game_dict[df.iloc[i, 1]] = Game(df.iloc[i, :])
-            self.category_set.update(self.game_dict[df.iloc[i, 1]].boardgamecategory)
-            self.mechanic_set.update(self.game_dict[df.iloc[i, 1]].boardgamemechanic)
-            self.family_set.update(self.game_dict[df.iloc[i, 1]].boardgamefamily)
+            self.game_dict[df.iloc[i, 2]] = Game(df.iloc[i, :])
+            self.category_set.update(self.game_dict[df.iloc[i, 2]].boardgamecategory)
+            self.mechanic_set.update(self.game_dict[df.iloc[i, 2]].boardgamemechanic)
+            self.family_set.update(self.game_dict[df.iloc[i, 2]].boardgamefamily)
 
     # def category_network(self):
     #     self.category_link = pd.DataFrame({'Source':[], 'Target':[], 'Value':[]})
