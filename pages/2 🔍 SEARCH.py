@@ -67,7 +67,11 @@ if 'button' not in st.session_state:
 
 session = select_game(search_results)
 
-game_name = list(search_results.keys())[session]
-game_id = search_results[game_name][0]
+if session !=None:
+    game_name = list(input_dict.keys())[session]
+    game_id = input_dict[game_name]
 
-detailed_page(game_name)
+    detailed_page(game_name,game_id,df_game,df_review)
+    
+else:
+    st.markdown("#### Press Game Name")
