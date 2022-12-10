@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import numpy as np
 
@@ -10,98 +11,83 @@ import streamlit.components.v1 as components
 
 from utils.detailed_page import make_popup
 
+sys.path.append('../')
+from network_function.network_generater import GameNetwork
 
-st.markdown("# Main page")
-st.sidebar.markdown("Welcome to")
-# st.sidebar.slider("Display Records:",0,100,50)
+st.markdown("# Network Page")
+st.sidebar.markdown("Filtering Options")
 
+# Sidebar
+min_players = st.sidebar.slider("Min. Players:", value=[2,4], min_value=0, max_value=10)
+max_players = st.sidebar.slider("Max. Players:", value=[5,8], min_value=2, max_value=999)
+playing_time = st.sidebar.slider("Playing Time:", value=[10,60], min_value=10, max_value=60000, step=10)
+min_age = st.sidebar.slider("Min. Age:", value=[5,10], min_value=5, max_value=25)
+bayes_average = st.sidebar.slider("Rating:", value=[7,10], min_value=0, max_value=10) # 평점
+board_game_rank = st.sidebar.slider("Board Game Rank:", value=[1,100], min_value=1, max_value=99999) # 랭킹
+average_weight = st.sidebar.slider("Weight:", value=[2,4], min_value=0, max_value=5) # Weight
 
-#row = st.sidebar.slider("Display Records:",0,100,50)
-
-#if st.checkbox("Show original dataset"):
-#    st.write(data.iloc[0:row])
-
+# filter 설정
+filter = {'minplayers': min_players,
+          'maxplayers': max_players,
+          'playingtime': playing_time,
+          'minage': min_age,
+          'bayesaverage': bayes_average,
+          'Board Game Rank': board_game_rank,
+          'averageweight': average_weight}
 
 tab1, tab2 = st.tabs(["Network", "Details"])
 data = np.random.randn(10, 1)
 
-# tab1.subheader("A tab with a chart")
-# tab1.line_chart(data)
-
 ### Graph
 # Read dataset (CSV)
-df_interact = pd.read_csv('example/data_drug/processed_drug_interactions.csv')
+df = pd.read_csv('data/tsne_game_info2.csv')
 
+# GameNetwork 객체 생성(게임 정보 및 네트워크 핸들링)
+game_network = GameNetwork(df)
 
 # Define list of selection options and sort alphabetically
-drug_list = ['Metformin', 'Glipizide', 'Lisinopril', 'Simvastatin',
-            'Warfarin', 'Aspirin', 'Losartan', 'Ibuprofen']
-drug_list.sort()
+game_list = list(df['primary'])
+game_list.sort()
 
 # Implement multiselect dropdown menu for option selection (returns a list)
-selected_drugs = st.multiselect('Select drug(s) to visualize', drug_list)
+# trigger 설정(1, 2, 3개 설정)(사실 4개 이상도 되긴 함)
+with tab1:
+    concept = st.radio("Get recommendation based on", ('Category', 'Mechanism'))
 
-# Set info message on initial site load
-if len(selected_drugs) == 0:
-    st.text('Choose at least 1 drug to start')
-
-# Create network graph when user selects >= 1 item
-else:
-    df_select = df_interact.loc[df_interact['drug_1_name'].isin(selected_drugs) | \
-                                df_interact['drug_2_name'].isin(selected_drugs)]
-    df_select = df_select.reset_index(drop=True)
-
-    # Create networkx graph object from pandas dataframe
-    G = nx.from_pandas_edgelist(df_select, 'drug_1_name', 'drug_2_name', 'weight')
-
-    # Initiate PyVis network object
-    drug_net = Network(
-                       height='400px',
-                       width='100%',
-                       bgcolor='#222222',
-                       font_color='white'
-                      )
-
-    # 대표 node coloring
-    for node in G:
-        if node in selected_drugs:
-            drug_net.add_node(node, color='#FFFFFF', size=30)
+    triggers = st.multiselect('Choose 1~3 games to start', game_list)
 
     # 사용자가 지정한 node 정보 (대표 node 3개)
-    for i in selected_drugs:
+    for i in triggers:
         print(i)
     print()
 
-    # Take Networkx graph and translate it to a PyVis graph format
-    drug_net.from_nx(G)
+    run = st.button('Run')
 
-    # Generate network with specific layout settings
-    drug_net.repulsion(
-                        node_distance=420,
-                        central_gravity=0.33,
-                        spring_length=110,
-                        spring_strength=0.10,
-                        damping=0.95
-                       )
+    # Category 기반 추천
+    if 1 <= len(triggers) <= 3 and concept == 'Category' and run == True:  
+        # 추천 게임 네트워크 도출(GameNetwork 내부 메서드 사용)
+        recomm_G = game_network.category_recomm_network(triggers=triggers, filter=filter, recommend_num=10)
 
-    # Save and read graph as HTML file (on Streamlit Sharing)
-    try:
-        path = '/tmp'
-        drug_net.save_graph(f'{path}/pyvis_graph.html')
-        HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+        # 대표 node coloring 
+        # AttributeError: 'GameNetwork' object has no attribute 'add_node' 발생
+        # for node in recomm_G:
+        #     if node in triggers:
+        #         game_network.add_node(node, color='#FFFFFF', size=30)
 
-    # Save and read graph as HTML file (locally)
-    except:
-        path = '/html_files'
-        drug_net.save_graph(f'{path}/pyvis_graph.html')
-        HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+        # node 출력
+        print(recomm_G.nodes())
+        # edge 출력
+        print(recomm_G.edges())
 
-    # Load HTML file in HTML component for display on Streamlit page
-    components.html(HtmlFile.read(), height=435)
+        # 그래프 보여주는 부분 추가 필요
+
+    # Mechanism 기반 추천
+    elif 1 <= len(triggers) <= 3 and concept == 'Mechanism' and run == True:
+        pass
 
 
 tab2.subheader("A tab with the data")
 tab2.write(data)
 
 #Pop-up Module, to be modified to use Game_ID as an input
-make_popup("Halli Galli")
+# make_popup("Halli Galli")

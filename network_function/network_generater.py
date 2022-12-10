@@ -5,8 +5,10 @@ import networkx as nx
 from sklearn.manifold import TSNE
 from itertools import permutations
 
-from network_utils import cos_sim
+# from network_utils import cos_sim
 
+# NETWORK.py에서 사용할 때
+from network_function.network_utils import cos_sim
 
 class Game():
     def __init__(self, df):
@@ -152,9 +154,9 @@ class GameNetwork():
 
         filtered_game_df = self.game_df.copy()
         for feature, bound in filter.items():
-            if feature in ['minplayers', 'playingtime', 'minage', 'Board Game Rank', 'averageweight']:
+            if feature in ['minplayers', 'playingtime', 'minage', 'bayesaverage', 'Board Game Rank', 'averageweight']:
                 filtered_game_df = filtered_game_df[filtered_game_df[feature]>=bound[0]]
-            if feature in ['maxplayers', 'playingtime', 'Board Game Rank', 'averageweight']:
+            if feature in ['maxplayers', 'playingtime', 'bayesaverage', 'Board Game Rank', 'averageweight']:
                 filtered_game_df = filtered_game_df[filtered_game_df[feature]<=bound[1]]
 
         # filtered_game_df['cossim_trigger1'] = 0.0
@@ -286,7 +288,7 @@ if __name__ == '__main__':
     현종 이 밑으로 따라하면 됨 ㅇㅇㅇㅇ
     '''
     # input data 로드(tsne 칼럼 포함)
-    df = pd.read_csv('data/tsne_game_info2.csv')
+    df = pd.read_csv('../data/tsne_game_info2.csv')
     # GameNetwork 객체 생성(게임 정보 및 네트워크 핸들링)
     game_network = GameNetwork(df)
 
@@ -309,6 +311,7 @@ if __name__ == '__main__':
     plt.figure(figsize=(20, 20))
     pos = nx.spring_layout(recomm_G, k = 0.15)
     nx.draw_networkx(recomm_G,pos, node_size = 25, node_color = 'blue')
+    # plt.savefig('fig.png', dpi=300) # for check
     plt.show()
 
 
