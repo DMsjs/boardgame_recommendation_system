@@ -71,7 +71,8 @@ if session !=None:
     game_name = list(input_dict.keys())[session]
     game_id = input_dict[game_name]
 
+    df_review=df_review[df_review["ID"]==game_id]
     detailed_page(game_name,game_id,df_game,df_review)
-    
+
 else:
     st.markdown("#### Press Game Name")
