@@ -15,6 +15,10 @@ pyarrow = "*"
 fuzzywuzzy = "*"
 streamlit-modal = "*"
 streamlit-wordcloud = "*"
+langdetect = "*"
+swifter = "*"
+plotly = "*"
+nltk = "*"
 
 [dev-packages]
 ipykernel = "*"

@@ -55,7 +55,12 @@ def select_game(input_dict):
             st.session_state['button'] = i
         else:pass
     
-    return st.session_state['button']
+    if "button" in st.session_state.keys():
+        result = st.session_state['button']
+    else:
+        result = None
+    
+    return result
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -75,12 +80,15 @@ name_id_dict = name_id_dict()
 
 search_results = search_games(input_string=input_string, name_id_dict=name_id_dict)
 
-if 'button' not in st.session_state:
-    st.session_state['button'] = 0
+# if 'button' not in st.session_state:
+#     st.session_state['button'] = 0
 
 session = select_game(search_results)
 
-game_name = list(search_results.keys())[session]
-game_id = search_results[game_name][0]
+if session !=None:
+    game_name = list(search_results.keys())[session]
+    game_id = search_results[game_name][0]
 
-detailed_page(game_name)
+    detailed_page(game_name,game_id,current_page='search')
+else:
+    st.markdown("#### Press Game Name")

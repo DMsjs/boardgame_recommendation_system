@@ -6,9 +6,10 @@ app = Flask(__name__)
 
 # basic_data_old = csv.read_csv('./data/2020-08-19.csv').to_pandas()
 basic_data_new = csv.read_csv('./data/2022-01-08.csv').to_pandas()
-detailed_data = csv.read_csv('./data/games_detailed_info.csv').to_pandas()
+detailed_data = csv.read_csv('./data/new_detailed_data.csv').to_pandas()
 # review_data_old = csv.read_csv('./data/bgg-15m-reviews.csv').to_pandas()
 review_data_new = csv.read_csv('./data/bgg-19m-reviews.csv').to_pandas()
+games = csv.read_csv('./data/games.csv').to_pandas()
 
 @app.route("/")
 def init():
@@ -35,7 +36,7 @@ def get_data():
         if content == None:
             return data.to_dict(orient='records')[0]
         else:
-            return data.to_dict(orient='records')[0][content]
+            return str(data.to_dict(orient='records')[0][content])
 
     elif source == 'detailed-data':
         game_id = args.get('game-id')
@@ -44,7 +45,16 @@ def get_data():
         if content == None:
             return data.to_dict(orient='records')[0]
         else:
-            return data.to_dict(orient='records')[0][content]
+            return str(data.to_dict(orient='records')[0][content])
+    
+    elif source == 'games':
+        game_id = args.get('game-id')
+        content = args.get('content')
+        data = games[games['BGGId']==int(game_id)]
+        if content == None:
+            return data.to_dict(orient='records')[0]
+        else:
+            return str(data.to_dict(orient='records')[0][content])
     
     # elif source == 'review-data-old':
     #     game_id = args.get('game-id')
@@ -102,5 +112,3 @@ def get_name_id_dict():
         return df.set_index('ID').T.to_dict('list')
     else:
         raise Exception('Error: invalid mode')
-        
-    
