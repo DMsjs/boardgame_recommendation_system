@@ -14,6 +14,8 @@ from utils.detailed_page import make_popup
 sys.path.append('../')
 from network_function.network_generater import GameNetwork
 
+current_page = "network"
+
 @st.cache(allow_output_mutation=True)
 def load_network(df):
     print('loading network!')
@@ -23,12 +25,16 @@ st.markdown("# Network Page")
 st.sidebar.markdown("Filtering Options")
 
 # Sidebar
-players = st.sidebar.slider("Number of Players:", value=[2,4], min_value=2, max_value=10)
-min_playing_time, max_playing_time = st.sidebar.select_slider("Playing Time (Minutes):", options=[0, 20, 60, 120, 'Max'], value=[0, 60])
+players = st.sidebar.slider("Number of Players:", value=[2,4], min_value=1, max_value=10)
+min_playing_time, max_playing_time = st.sidebar.select_slider("Playing Time (Minutes):", options=[0, 30, 60, 120, 180, 'Max'], value=[0, 180])
 min_age = st.sidebar.slider("Min. Age:", value=[5,10], min_value=5, max_value=25)
 bayes_average = st.sidebar.slider("Rating:", value=[7,10], min_value=0, max_value=10) # 평점
-min_rank, max_rank = st.sidebar.select_slider("Board Game Ranking:", options=[0, 10, 50, 100, 500, 1000, 5000, 10000, 'Max'], value=[0, 100]) # 랭킹
+min_rank, max_rank = st.sidebar.select_slider("Board Game Ranking:", options=[0, 10, 50, 100, 500, 1000, 5000, 10000, 'Max'], value=[0, 'Max']) # 랭킹
 average_weight = st.sidebar.slider("Difficulty Level:", value=[2,4], min_value=0, max_value=5) # Weight
+
+st.sidebar.markdown("Recommendation Options")
+num_recommend = st.sidebar.number_input("# of recommend", value=10, step=1)
+
 
 # Post-processing
 min_players = (players[0], None)
@@ -77,7 +83,7 @@ with tab1:
     concept = st.radio("Get recommendation based on", ('Category', 'Mechanism'))
 
     triggers = st.multiselect('Choose 1~3 games to start', game_list)
-
+    
     # 사용자가 지정한 node 정보 (대표 node 3개)
     for i in triggers:
         print(i)
@@ -85,10 +91,19 @@ with tab1:
 
     run = st.button('Run')
 
+    if run == True :
+        wait_sign = st.markdown("Please wait...")
+
+
     # Category 기반 추천
-    if len(triggers) >= 1 and concept == 'Category' and run == True:  
+    if len(triggers) >= 1 and run == True:  
         # 추천 게임 네트워크 도출(GameNetwork 내부 메서드 사용)
-        recomm_G = game_network.category_recomm_network(triggers=triggers, filter=filter, recommend_num=10)
+        recomm_G, recommended_df_dict = game_network.category_recomm_network(
+            triggers=triggers, 
+            filter=filter, 
+            recommend_num=num_recommend, 
+            concept=concept
+            )
 
         # 대표 node coloring 
         # AttributeError: 'GameNetwork' object has no attribute 'add_node' 발생
@@ -102,10 +117,42 @@ with tab1:
         print(recomm_G.edges())
 
         # 그래프 보여주는 부분 추가 필요
+        # Initiate PyVis network object
+        game_net = Network(
+                        height='400px',
+                        width='100%',
+                        bgcolor='#222222',
+                        font_color='white'
+                        )
 
-    # Mechanism 기반 추천
-    elif len(triggers) >= 1 and concept == 'Mechanism' and run == True:
-        pass
+        # Take Networkx graph and translate it to a PyVis graph format
+        game_net.from_nx(recomm_G)
+
+        # Generate network with specific layout settings
+        game_net.repulsion(
+                            node_distance=420,
+                            central_gravity=0.33,
+                            spring_length=110,
+                            spring_strength=0.10,
+                            damping=0.95
+                        )
+
+        # Save and read graph as HTML file (on Streamlit Sharing)
+        try:
+            path = '/tmp'
+            game_net.save_graph(f'{path}/pyvis_graph.html')
+            HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+
+        # Save and read graph as HTML file (locally)
+        except:
+            path = 'html_files'
+            game_net.save_graph(f'{path}/pyvis_graph.html')
+            HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+
+        # Load HTML file in HTML component for display on Streamlit page
+        components.html(HtmlFile.read(), height=435)
+
+        wait_sign = st.markdown("")
 
 
 tab2.subheader("A tab with the data")
