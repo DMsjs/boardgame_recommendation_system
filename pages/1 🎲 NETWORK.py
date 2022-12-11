@@ -14,17 +14,35 @@ from utils.detailed_page import make_popup
 sys.path.append('../')
 from network_function.network_generater import GameNetwork
 
+@st.cache(allow_output_mutation=True)
+def load_network(df):
+    print('loading network!')
+    return GameNetwork(df)
+
 st.markdown("# Network Page")
 st.sidebar.markdown("Filtering Options")
 
 # Sidebar
-min_players = st.sidebar.slider("Min. Players:", value=[2,4], min_value=0, max_value=10)
-max_players = st.sidebar.slider("Max. Players:", value=[5,8], min_value=2, max_value=999)
-playing_time = st.sidebar.slider("Playing Time:", value=[10,60], min_value=10, max_value=60000, step=10)
+players = st.sidebar.slider("Number of Players:", value=[2,4], min_value=2, max_value=10)
+min_playing_time, max_playing_time = st.sidebar.select_slider("Playing Time (Minutes):", options=[0, 20, 60, 120, 'Max'], value=[0, 60])
 min_age = st.sidebar.slider("Min. Age:", value=[5,10], min_value=5, max_value=25)
 bayes_average = st.sidebar.slider("Rating:", value=[7,10], min_value=0, max_value=10) # 평점
-board_game_rank = st.sidebar.slider("Board Game Rank:", value=[1,100], min_value=1, max_value=99999) # 랭킹
-average_weight = st.sidebar.slider("Weight:", value=[2,4], min_value=0, max_value=5) # Weight
+min_rank, max_rank = st.sidebar.select_slider("Board Game Ranking:", options=[0, 10, 50, 100, 500, 1000, 5000, 10000, 'Max'], value=[0, 100]) # 랭킹
+average_weight = st.sidebar.slider("Difficulty Level:", value=[2,4], min_value=0, max_value=5) # Weight
+
+# Post-processing
+min_players = (players[0], None)
+max_players = (None, players[1])
+
+if max_playing_time == 'Max':
+    playing_time = (min_playing_time, 60000)
+else:
+    playing_time = (min_playing_time, max_playing_time)
+
+if max_rank == 'Max':
+    board_game_rank = (min_rank, 99999)
+else:
+    board_game_rank = (min_rank, max_rank)
 
 # filter 설정
 filter = {'minplayers': min_players,
@@ -35,15 +53,19 @@ filter = {'minplayers': min_players,
           'Board Game Rank': board_game_rank,
           'averageweight': average_weight}
 
+# print(filter)
+
 tab1, tab2 = st.tabs(["Network", "Details"])
 data = np.random.randn(10, 1)
 
 ### Graph
 # Read dataset (CSV)
-df = pd.read_csv('data/tsne_game_info2.csv')
+df = pd.read_csv('data/tsne_game_info3.csv')
+# df = pd.read_csv('data/tsne_game_info2_mini.csv') # 빠른 실행을 위해
 
 # GameNetwork 객체 생성(게임 정보 및 네트워크 핸들링)
-game_network = GameNetwork(df)
+# game_network = GameNetwork(df)
+game_network = load_network(df) # load_network 사용하면 옵션 바뀔 때마다 다시 실행되지 않음
 
 # Define list of selection options and sort alphabetically
 game_list = list(df['primary'])
@@ -64,7 +86,7 @@ with tab1:
     run = st.button('Run')
 
     # Category 기반 추천
-    if 1 <= len(triggers) <= 3 and concept == 'Category' and run == True:  
+    if len(triggers) >= 1 and concept == 'Category' and run == True:  
         # 추천 게임 네트워크 도출(GameNetwork 내부 메서드 사용)
         recomm_G = game_network.category_recomm_network(triggers=triggers, filter=filter, recommend_num=10)
 
@@ -82,7 +104,7 @@ with tab1:
         # 그래프 보여주는 부분 추가 필요
 
     # Mechanism 기반 추천
-    elif 1 <= len(triggers) <= 3 and concept == 'Mechanism' and run == True:
+    elif len(triggers) >= 1 and concept == 'Mechanism' and run == True:
         pass
 
 
