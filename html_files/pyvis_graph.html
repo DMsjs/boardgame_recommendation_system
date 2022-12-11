@@ -1,0 +1,116 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 100%;
+            height: 400px;
+            background-color: #222222;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"font": {"color": "white"}, "id": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Assault: Tactical Combat in Europe \u2013 1985", "label": "Assault: Tactical Combat in Europe \u2013 1985", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Berlin \u002785: The Enemy at the Gates", "label": "Berlin \u002785: The Enemy at the Gates", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Chaosmos", "label": "Chaosmos", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Warhammer 40,000: Dark Imperium", "label": "Warhammer 40,000: Dark Imperium", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Space Marine", "label": "Space Marine", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Empires of the Void", "label": "Empires of the Void", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Gettysburg: Badges of Courage", "label": "Gettysburg: Badges of Courage", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Warhammer 40,000: Rogue Trader", "label": "Warhammer 40,000: Rogue Trader", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Warhammer 40,000: Heroes of Black Reach", "label": "Warhammer 40,000: Heroes of Black Reach", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "007 James Bond: Live and Let Die", "label": "007 James Bond: Live and Let Die", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Laguna", "label": "Laguna", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Top Gun Strategy Game", "label": "Top Gun Strategy Game", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Back to the Future: An Adventure Through Time", "label": "Back to the Future: An Adventure Through Time", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Godzilla: Kaiju World Wars", "label": "Godzilla: Kaiju World Wars", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Escape Team", "label": "Escape Team", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Fantomen", "label": "Fantomen", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "The Isle of Pan", "label": "The Isle of Pan", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Les Cabanes de M\u0027sieur Robinson", "label": "Les Cabanes de M\u0027sieur Robinson", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "X Marks the Spot", "label": "X Marks the Spot", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "RAMbots", "label": "RAMbots", "shape": "dot", "size": 10}]);
+        edges = new vis.DataSet([{"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Assault: Tactical Combat in Europe \u2013 1985", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Berlin \u002785: The Enemy at the Gates", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Chaosmos", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Warhammer 40,000: Dark Imperium", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Space Marine", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Empires of the Void", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Gettysburg: Badges of Courage", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Warhammer 40,000: Rogue Trader", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Warhammer 40,000: Heroes of Black Reach", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Laguna", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Top Gun Strategy Game", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Back to the Future: An Adventure Through Time", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Godzilla: Kaiju World Wars", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Escape Team", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Fantomen", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "The Isle of Pan", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Les Cabanes de M\u0027sieur Robinson", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "X Marks the Spot", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "RAMbots", "weight": 1}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "repulsion": {
+            "centralGravity": 0.33,
+            "damping": 0.95,
+            "nodeDistance": 420,
+            "springConstant": 0.1,
+            "springLength": 110
+        },
+        "solver": "repulsion",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
