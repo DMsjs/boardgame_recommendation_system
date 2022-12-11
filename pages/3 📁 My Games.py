@@ -8,7 +8,7 @@ current_page = "my_games"
 tab1, tab2 = st.tabs(["Games", "Recommendation Results"])
 
 
-tab1.subheader("A tab with saved games")
+tab1.subheader("Saved Games")
 tab2.subheader("A tab with results obtained from Network Recommendation")
 
 
