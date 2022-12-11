@@ -35,7 +35,8 @@ def select_game(input_dict):
                 # image_list.append(st.image(img_url))
                 st.image(image=img_url, use_column_width='always')
             except:
-                pass
+                no_image = Image.open('no image.png')
+                st.image(no_image)
     for i,button in enumerate(button_list):
         if button:
             st.session_state['button'] = i

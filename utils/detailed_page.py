@@ -9,7 +9,7 @@ def detailed_page(Game_id):
     col1,col2 = st.columns([1,2])
 
     with col1:
-        st.image("https://cf.geekdo-images.com/kxYYgRlwM1NbHJHp62FLqg__opengraph/img/mbR9g_6T0kOKF1Me6ig6rWDJvX8=/fit-in/1200x630/filters:strip_icc()/pic458934.jpg")
+        st.image("https://cf.geekdo-images.com/kxYYgRlwM1NbHJHp62FLqg__opengraph/img/mbR9g_6T0kOKF1Me6ig6rWDJvX8=/fit-in/120git0x630/filters:strip_icc()/pic458934.jpg")
 
     with col2:
         st.write("- Players : 2-6 players")

@@ -4,9 +4,9 @@
 } */
 
 .stButton>button {
-    color: #4F8BF9;
+    color: 'white';
     /* border-radius: 50%; */
-    height: 4em;
+    height: 5em;
     width: 8em;
 }
 
