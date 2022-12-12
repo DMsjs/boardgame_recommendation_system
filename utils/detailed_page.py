@@ -11,17 +11,27 @@ import plotly.express as px
 import nltk
 from nltk.corpus import stopwords
 
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+
 from collections import Counter
 
 import webbrowser
 
+import sys
+sys.path.append('./utils/')
+from get_from_api import review_data
+import requests
 
 
-def get_rating_bar_chart(Game_Name,Game_ID,df):
+def get_rating_bar_chart(Game_Name,Game_ID):
     # 확인 필요!!
     # Input df : 특정 Game ID에 대한 리뷰 데이터
     # Create distplot with custom bin_size
-    fig = px.histogram(data, x="rating",nbins=15)
+    data = review_data(id=Game_ID, content='rating')
+    fig = px.histogram(data, labels={"value": "rating"}, nbins=15)
 
     # Plot
     st.plotly_chart(fig, use_container_width=True)
@@ -43,6 +53,7 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     stops.add("played")
     stops.add("playing")
 
+
     no_stops = [word for word in preprocessed_words if not word in stops]
 
     #LEMMATIZING
@@ -54,7 +65,6 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     final_words = [word for word in lemmatized_words if len(word)>2]
 
     counted_words = Counter(final_words)
-
 
     if len(counted_words)>50:
         max_words = 50
@@ -70,8 +80,7 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     words_for_wc = []
     for keyword in most_common_words.keys():
         words_for_wc.append(dict(text=keyword, value=most_common_words[keyword]))
-
-    
+        
     wordcloud.visualize(words_for_wc, tooltip_data_fields={'text':'Word', 'value':'Word Count'}, per_word_coloring=False)
 
 
@@ -79,9 +88,13 @@ def get_wordcloud_chart(Game_ID, df,current_page):
 
 def detailed_page(Game_Name,Game_ID,current_page):
     # Input 데이터 확인 필요!!
-    df_game = pd.read_csv("games.csv")
-    df_review = pd.read_csv("games_example_data.csv")
-    df_review = df_review[df_review["ID"]==Game_ID]
+    #df_game = pd.read_csv("./data/games.csv")
+    dict_game = requests.get('http://127.0.0.1:5000/api?data-source=games&game-id='+str(Game_ID)).json()
+
+
+    # df_review = pd.read_csv("./data/games_example_data.csv")
+    # df_review = df_review[df_review["ID"]==Game_ID]
+    df_review = review_data(id=Game_ID)
 
     st.markdown("## {}".format(Game_Name))
     col1,col2 = st.columns([1,2])
@@ -89,20 +102,21 @@ def detailed_page(Game_Name,Game_ID,current_page):
     game_row = df_game[df_game["BGGId"]==Game_ID]
 
     with col1:
-        st.image(list(game_row["ImagePath"])[0])
+        st.image(dict_game["ImagePath"])
 
     with col2:
         data_dict = {"o":["Details"],
-                "Players":["{} - {}".format(list(game_row["MinPlayers"])[0],list(game_row["MaxPlayers"])[0])],
-                "Play Time":["{} minute".format(list(game_row["MfgPlaytime"])[0])],
-                "Difficulty":[round(list(game_row["GameWeight"])[0],3)],
-                "Minimum Age":[list(game_row["MfgAgeRec"])[0]],
-                "Average Rating":[round(list(game_row["AvgRating"])[0],1)]}
+                "Players":["{} - {}".format(dict_game["MinPlayers"],dict_game["MaxPlayers"])],
+                "Play Time":["{} minute".format(dict_game["MfgPlaytime"])],
+                "Difficulty":[round(dict_game["GameWeight"],3)],
+                "Minimum Age":[dict_game["MfgAgeRec"]],
+                "Average Rating":[round(dict_game["AvgRating"],1)]}
 
         data= pd.DataFrame(data_dict).set_index("o").T
         st.table(data)
-
+        
         saved_df = pd.read_csv("./pages/saved_results/saved_game.csv")
+
         if Game_ID in list(saved_df["BGGId"]):
             save_button=st.button("Unsave this game")
             if save_button:
@@ -141,7 +155,8 @@ def detailed_page(Game_Name,Game_ID,current_page):
         pass
     else:
         st.markdown("### Rating Distribution")
-        get_rating_bar_chart(Game_Name,Game_ID,df_review)
+        get_rating_bar_chart(Game_Name,Game_ID)
+
     
     st.markdown("### Review Wordcloud")
     df_review.dropna(subset=["comment"],inplace=True)
@@ -163,4 +178,4 @@ def make_popup(Game_Name,Game_ID,current_page):
     if modal.is_open():
         with modal.container():
             detailed_page(Game_Name,Game_ID,current_page)
-            
+
