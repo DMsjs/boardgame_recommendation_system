@@ -1,7 +1,5 @@
 numpy==1.20.0
-pandas
 seaborn
-networkx
 tqdm
 scikit-learn
 matplotlib
@@ -10,6 +8,10 @@ networkx==2.8.6
 numpy==1.20.0
 pandas==1.4.4
 pyvis==0.2.1
+plotly
+fuzzywuzzy
+pillow
+requests
 streamlit==1.12.2
 streamlit_modal
 streamlit_wordcloud
