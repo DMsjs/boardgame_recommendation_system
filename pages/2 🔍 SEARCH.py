@@ -50,7 +50,8 @@ def select_game(input_dict):
                 resized_img = img.resize((300,400))
                 st.image(image=resized_img, use_column_width='always')
             except:
-                pass
+                no_image = Image.open('no image.png')
+                st.image(no_image)
     for i,button in enumerate(button_list):
         if button:
             st.session_state['button'] = i
