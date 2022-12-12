@@ -93,7 +93,7 @@ def get_wordcloud_chart(Game_ID, df,current_page):
 def detailed_page(Game_Name,Game_ID,current_page):
     # Input 데이터 확인 필요!!
     df_game = pd.read_csv("./data/games.csv")
-    dict_game = requests.get('http://127.0.0.1:5000/api?data-source=games&game-id='+str(Game_ID)).json()
+    dict_game = requests.get('http://147.46.94.205:8000/api?data-source=games&game-id='+str(Game_ID)).json()
 
 
     # df_review = pd.read_csv("./data/games_example_data.csv")
