@@ -27,7 +27,7 @@ def get_rating_bar_chart(Game_Name,Game_ID):
     # 확인 필요!!
     # Input df : 특정 Game ID에 대한 리뷰 데이터
     # Create distplot with custom bin_size
-    data = review_data(id=Game_ID, mode='No Language', content='rating')
+    data = review_data(id=Game_ID, content='rating')
     fig = px.histogram(data, labels={"value": "rating"}, nbins=15)
 
     # Plot
@@ -92,7 +92,7 @@ def detailed_page(Game_Name,Game_ID,current_page):
 
     # df_review = pd.read_csv("./data/games_example_data.csv")
     # df_review = df_review[df_review["ID"]==Game_ID]
-    df_review = review_data(id=Game_ID, mode='Language', content='comment')
+    df_review = review_data(id=Game_ID)
 
     st.markdown("## {}".format(Game_Name))
     col1,col2 = st.columns([1,2])

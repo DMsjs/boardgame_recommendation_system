@@ -4,12 +4,12 @@ from pyarrow import csv
 
 app = Flask(__name__)
 
-# basic_data_old = csv.read_csv('./data/2020-08-19.csv').to_pandas()
 basic_data_new = csv.read_csv('./data/2022-01-08.csv').to_pandas()
-detailed_data = csv.read_csv('./data/new_detailed_data.csv').to_pandas()
-# review_data_old = csv.read_csv('./data/bgg-15m-reviews.csv').to_pandas()
-review_data_new = csv.read_csv('./data/bgg-19m-reviews.csv').to_pandas()
+detailed_data = csv.read_csv('./data/detailed_with_tsne.csv').to_pandas()
+review_data_new = csv.read_csv('./data/review_lang_included.csv').to_pandas()
 games = csv.read_csv('./data/games.csv').to_pandas()
+network_input = csv.read_csv('./data/tsne_game_info4.csv').to_pandas()
+
 
 @app.route("/")
 def init():
@@ -51,6 +51,15 @@ def get_data():
         game_id = args.get('game-id')
         content = args.get('content')
         data = games[games['BGGId']==int(game_id)]
+        if content == None:
+            return data.to_dict(orient='records')[0]
+        else:
+            return str(data.to_dict(orient='records')[0][content])
+
+    elif source == 'network-input':
+        game_id = args.get('game-id')
+        content = args.get('content')
+        data = network_input[network_input['id']==int(game_id)]
         if content == None:
             return data.to_dict(orient='records')[0]
         else:
@@ -98,6 +107,8 @@ def get_game_list():
         return list(detailed_data['id'])
     elif mode == 'top5':
         return list(detailed_data['id'][detailed_data['Board Game Rank'].apply(rank_to_int)<=5])
+    elif mode == 'network-input':
+        return list(network_input['id'])
     else:
         raise Exception('Error: invalid mode')
 

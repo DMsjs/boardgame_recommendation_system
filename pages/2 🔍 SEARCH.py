@@ -28,6 +28,7 @@ def search_games(input_string, name_id_dict=name_id_dict()):
         for name,score in results:
             results_dict[name] = name_id_dict[name]
         st.subheader('Results')
+        # st.session_state['search'] = 1
 
     return results_dict
 
@@ -74,11 +75,17 @@ local_css('css/style.css')
 
 
 st.markdown("# Search Page")
+# st.session_state['searched_word'] = 'No input'
 
 input_string = st.text_input('Enter search words:',"")
 name_id_dict = name_id_dict()
-
+# st.session_state['searched_word'] = input_string
 search_results = search_games(input_string=input_string, name_id_dict=name_id_dict)
+# if ('searched_word' not in st.session_state.keys()) and (st.session_state['searched_word'] == input_string):
+#     search_results = search_games(input_string=input_string, name_id_dict=name_id_dict)
+# else:
+#     search_results = search_games(input_string=input_string, name_id_dict=name_id_dict)
+#     st.session_state['searched_word'] = input_string
 
 # if 'button' not in st.session_state:
 #     st.session_state['button'] = 0
