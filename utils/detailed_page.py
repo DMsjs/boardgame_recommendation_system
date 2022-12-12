@@ -72,7 +72,11 @@ def get_wordcloud_chart(Game_ID, df,current_page):
         max_words=len(counted_words)
     
     if current_page == "search" :
-        top_k = st.slider("Display Records:",0,max_words,round(max_words/2))
+        if max_words != 0:
+            top_k = st.slider("Display Records:",0,max_words,round(max_words/2))
+        else:
+            top_k = 0
+            st.write('No reviews')
     else:
         top_k=round(max_words/2)
     most_common_words = dict(counted_words.most_common(top_k))

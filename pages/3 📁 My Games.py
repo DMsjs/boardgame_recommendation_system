@@ -41,7 +41,7 @@ with tab1:
                 st.write(data[list(data_col_dict.keys())[i]][data_idx])
     
         with columns_list[-1]:
-            button_list.append(st.button("Delete {}".format(data_idx)))
+            button_list.append(st.button(label="Delete", key="Delete {}".format(data_idx)))
     
 
     for i,button in enumerate(button_list):
