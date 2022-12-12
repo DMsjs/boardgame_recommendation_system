@@ -14,10 +14,10 @@ st.set_page_config(page_title='Search', page_icon="🔍")
 
 def search_games(input_string, name_id_dict=name_id_dict()):
     if input_string == '':
-        top5_id_list = requests.get('http://127.0.0.1:5000/game_list?mode=top5').json()
+        top5_id_list = requests.get('http://147.46.94.205:8000/game_list?mode=top5').json()
         results_dict = dict()
         for id in top5_id_list:
-            game_name = requests.get('http://127.0.0.1:5000/api?data-source=basic-data-new&game-id='+str(id)+'&content=Name').text
+            game_name = requests.get('http://147.46.94.205:8000/api?data-source=basic-data-new&game-id='+str(id)+'&content=Name').text
             results_dict[game_name] = [id]
         st.subheader('Top 5 Games')
         
@@ -44,7 +44,7 @@ def select_game(input_dict):
                 else: button_text = list(input_dict.keys())[col_idx]
                 button_list.append(st.button(label=button_text, key=list(input_dict.keys())[col_idx]))
                 game_id = input_dict[list(input_dict.keys())[col_idx]][0]
-                img_url = requests.get('http://127.0.0.1:5000/api?data-source=detailed-data&game-id='+str(game_id)+'&content=image').text
+                img_url = requests.get('http://147.46.94.205:8000/api?data-source=detailed-data&game-id='+str(game_id)+'&content=image').text
                 img_response = requests.get(img_url)
                 img = Image.open(BytesIO(img_response.content))
                 resized_img = img.resize((300,400))

@@ -123,3 +123,6 @@ def get_name_id_dict():
         return df.set_index('ID').T.to_dict('list')
     else:
         raise Exception('Error: invalid mode')
+
+if __name__=="__main__":
+    app.run(host="127.0.0.1", port="5000", debug=False)
