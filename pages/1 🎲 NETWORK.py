@@ -127,8 +127,17 @@ with tab1:
                                 font_color='white'
                                 )
 
+                # add color and resize node
+                for trigger in triggers:
+                    game_net.add_node(trigger, label=trigger, color='#FFFFFF', size=40)
+
+                for node in recomm_G.nodes():
+                    game_net.add_node(node)
+                for source, target in recomm_G.edges():
+                    game_net.add_edge(source, target, color='#97c2fc')
                 # Take Networkx graph and translate it to a PyVis graph format
-                game_net.from_nx(recomm_G)
+                # game_net.from_nx(recomm_G)
+
 
                 # Generate network with specific layout settings
                 game_net.repulsion(
