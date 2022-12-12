@@ -1,62 +1,106 @@
 <html>
-<head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
 <center>
 <h1></h1>
 </center>
 
 <!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
 <script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
 
-<style type="text/css">
 
-        #mynetwork {
-            width: 100%;
-            height: 400px;
-            background-color: #222222;
-            border: 1px solid lightgray;
-            position: relative;
-            float: left;
-        }
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 400px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
 
         
-
         
 
-        
-</style>
+        <script type="text/javascript">
 
-</head>
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
 
-<body>
-<div id = "mynetwork"></div>
+              
 
+              
 
-<script type="text/javascript">
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
 
-    // initialize global variables.
-    var edges;
-    var nodes;
-    var network; 
-    var container;
-    var options, data;
+                  
 
-    
-    // This method is responsible for drawing the graph, returns the drawn network
-    function drawGraph() {
-        var container = document.getElementById('mynetwork');
-        
-        
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#FFFFFF", "font": {"color": "white"}, "id": "Splendor", "label": "Splendor", "shape": "dot", "size": 40}, {"color": "#FFFFFF", "font": {"color": "white"}, "id": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "label": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "shape": "dot", "size": 40}, {"color": "#FFFFFF", "font": {"color": "white"}, "id": "10 Dice", "label": "10 Dice", "shape": "dot", "size": 40}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Clank!: A Deck-Building Adventure", "label": "Clank!: A Deck-Building Adventure", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Android: Netrunner", "label": "Android: Netrunner", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Race for the Galaxy", "label": "Race for the Galaxy", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Raiders of the North Sea", "label": "Raiders of the North Sea", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Five Tribes", "label": "Five Tribes", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Pandemic Legacy: Season 0", "label": "Pandemic Legacy: Season 0", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Tigris \u0026 Euphrates", "label": "Tigris \u0026 Euphrates", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "The Voyages of Marco Polo", "label": "The Voyages of Marco Polo", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Trajan", "label": "Trajan", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Lorenzo il Magnifico", "label": "Lorenzo il Magnifico", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Grand Austria Hotel", "label": "Grand Austria Hotel", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Mombasa", "label": "Mombasa", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Russian Railroads", "label": "Russian Railroads", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Tzolk\u0027in: The Mayan Calendar", "label": "Tzolk\u0027in: The Mayan Calendar", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Pandemic Legacy: Season 2", "label": "Pandemic Legacy: Season 2", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Mechs vs. Minions", "label": "Mechs vs. Minions", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "7 Wonders Duel", "label": "7 Wonders Duel", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Blood Rage", "label": "Blood Rage", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Root", "label": "Root", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Clank!: Legacy \u2013 Acquisitions Incorporated", "label": "Clank!: Legacy \u2013 Acquisitions Incorporated", "shape": "dot"}, {"color": "#97c2fc", "font": {"color": "white"}, "id": "Orl\u00e9ans", "label": "Orl\u00e9ans", "shape": "dot"}]);
+                  edges = new vis.DataSet([{"color": "#97c2fc", "from": "Splendor", "to": "Clank!: A Deck-Building Adventure"}, {"color": "#97c2fc", "from": "Splendor", "to": "Android: Netrunner"}, {"color": "#97c2fc", "from": "Splendor", "to": "Race for the Galaxy"}, {"color": "#97c2fc", "from": "Splendor", "to": "Raiders of the North Sea"}, {"color": "#97c2fc", "from": "Splendor", "to": "Five Tribes"}, {"color": "#97c2fc", "from": "Splendor", "to": "Pandemic Legacy: Season 0"}, {"color": "#97c2fc", "from": "Splendor", "to": "Tigris \u0026 Euphrates"}, {"color": "#97c2fc", "from": "Splendor", "to": "The Voyages of Marco Polo"}, {"color": "#97c2fc", "from": "Splendor", "to": "Trajan"}, {"color": "#97c2fc", "from": "Splendor", "to": "Lorenzo il Magnifico"}, {"color": "#97c2fc", "from": "Splendor", "to": "Grand Austria Hotel"}, {"color": "#97c2fc", "from": "Splendor", "to": "Mombasa"}, {"color": "#97c2fc", "from": "Splendor", "to": "Russian Railroads"}, {"color": "#97c2fc", "from": "Splendor", "to": "Tzolk\u0027in: The Mayan Calendar"}, {"color": "#97c2fc", "from": "Splendor", "to": "Pandemic Legacy: Season 2"}, {"color": "#97c2fc", "from": "Splendor", "to": "Mechs vs. Minions"}, {"color": "#97c2fc", "from": "Splendor", "to": "7 Wonders Duel"}, {"color": "#97c2fc", "from": "Splendor", "to": "Blood Rage"}, {"color": "#97c2fc", "from": "Splendor", "to": "Root"}, {"color": "#97c2fc", "from": "Splendor", "to": "Clank!: Legacy \u2013 Acquisitions Incorporated"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Pandemic Legacy: Season 0"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Clank!: A Deck-Building Adventure"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Android: Netrunner"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Raiders of the North Sea"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Race for the Galaxy"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Tigris \u0026 Euphrates"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Five Tribes"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Trajan"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Lorenzo il Magnifico"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Russian Railroads"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "The Voyages of Marco Polo"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Grand Austria Hotel"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Pandemic Legacy: Season 2"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Mombasa"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Tzolk\u0027in: The Mayan Calendar"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Mechs vs. Minions"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Blood Rage"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Orl\u00e9ans"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "Root"}, {"color": "#97c2fc", "from": "\u0027CA\u0027 Tactical Naval Warfare in the Pacific, 1941-45", "to": "7 Wonders Duel"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Pandemic Legacy: Season 0"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Android: Netrunner"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Clank!: A Deck-Building Adventure"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Raiders of the North Sea"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Race for the Galaxy"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Tigris \u0026 Euphrates"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Five Tribes"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Trajan"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Lorenzo il Magnifico"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Russian Railroads"}, {"color": "#97c2fc", "from": "10 Dice", "to": "The Voyages of Marco Polo"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Grand Austria Hotel"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Pandemic Legacy: Season 2"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Mombasa"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Tzolk\u0027in: The Mayan Calendar"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Mechs vs. Minions"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Blood Rage"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Orl\u00e9ans"}, {"color": "#97c2fc", "from": "10 Dice", "to": "Root"}, {"color": "#97c2fc", "from": "10 Dice", "to": "7 Wonders Duel"}]);
 
-        // parsing and collecting nodes and edges from the python
-        nodes = new vis.DataSet([{"font": {"color": "white"}, "id": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Assault: Tactical Combat in Europe \u2013 1985", "label": "Assault: Tactical Combat in Europe \u2013 1985", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Berlin \u002785: The Enemy at the Gates", "label": "Berlin \u002785: The Enemy at the Gates", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Chaosmos", "label": "Chaosmos", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Warhammer 40,000: Dark Imperium", "label": "Warhammer 40,000: Dark Imperium", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Space Marine", "label": "Space Marine", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Empires of the Void", "label": "Empires of the Void", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Gettysburg: Badges of Courage", "label": "Gettysburg: Badges of Courage", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Warhammer 40,000: Rogue Trader", "label": "Warhammer 40,000: Rogue Trader", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Warhammer 40,000: Heroes of Black Reach", "label": "Warhammer 40,000: Heroes of Black Reach", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "007 James Bond: Live and Let Die", "label": "007 James Bond: Live and Let Die", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Laguna", "label": "Laguna", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Top Gun Strategy Game", "label": "Top Gun Strategy Game", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Back to the Future: An Adventure Through Time", "label": "Back to the Future: An Adventure Through Time", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Godzilla: Kaiju World Wars", "label": "Godzilla: Kaiju World Wars", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Escape Team", "label": "Escape Team", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Fantomen", "label": "Fantomen", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "The Isle of Pan", "label": "The Isle of Pan", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "Les Cabanes de M\u0027sieur Robinson", "label": "Les Cabanes de M\u0027sieur Robinson", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "X Marks the Spot", "label": "X Marks the Spot", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "id": "RAMbots", "label": "RAMbots", "shape": "dot", "size": 10}]);
-        edges = new vis.DataSet([{"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Assault: Tactical Combat in Europe \u2013 1985", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Berlin \u002785: The Enemy at the Gates", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Chaosmos", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Warhammer 40,000: Dark Imperium", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Space Marine", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Empires of the Void", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Gettysburg: Badges of Courage", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Warhammer 40,000: Rogue Trader", "weight": 1}, {"from": "\u002765: Squad-Level Combat in the Jungles of Vietnam", "label": 1, "to": "Warhammer 40,000: Heroes of Black Reach", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Laguna", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Top Gun Strategy Game", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Back to the Future: An Adventure Through Time", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Godzilla: Kaiju World Wars", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Escape Team", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Fantomen", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "The Isle of Pan", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "Les Cabanes de M\u0027sieur Robinson", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "X Marks the Spot", "weight": 1}, {"from": "007 James Bond: Live and Let Die", "label": 1, "to": "RAMbots", "weight": 1}]);
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
 
-        // adding nodes and edges to the graph
-        data = {nodes: nodes, edges: edges};
-
-        var options = {
+                  var options = {
     "configure": {
         "enabled": false
     },
@@ -93,24 +137,27 @@
         }
     }
 };
-        
-        
 
-        
-
-        network = new vis.Network(container, data, options);
-	 
-        
+                  
 
 
-        
+                  
 
-        return network;
+                  network = new vis.Network(container, data, options);
 
-    }
+                  
 
-    drawGraph();
+                  
 
-</script>
-</body>
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
 </html>

@@ -1,3 +1,7 @@
+numpy==1.20.0
+pandas
+seaborn
+networkx
 tqdm
 scikit-learn
 matplotlib
