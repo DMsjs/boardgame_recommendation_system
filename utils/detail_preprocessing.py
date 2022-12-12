@@ -4,15 +4,13 @@ import re
 from itertools import permutations
 import pickle 
 from collections import OrderedDict
+from network_function.network_generater import Game, GameNetwork
 
-# list of columns
-features = ['primary','minplayers','maxplayers', 'playingtime','minage','boardgamecategory','boardgamemechanic','boardgamefamily', \
+features = ['id', 'primary','minplayers','maxplayers', 'playingtime','minage','boardgamecategory','boardgamemechanic','boardgamefamily', \
 'bayesaverage','Board Game Rank','averageweight']
 
-# load games data
 game_raw_data = pd.read_csv('data/games_detailed_info.csv')[features]
 game_raw_data_len = len(game_raw_data)
-# game_raw_data.to_csv('data/preprocessed_games_info.csv')
 
 # define features type 
 features_dict = {}
@@ -102,8 +100,47 @@ for i in game_raw_data['averageweight']:
         print(f'type: {type(i)} / item: {i}')
         nan_averageweight_count += 1
 
+################################################################
+#############################T-SNE##############################
+################################################################
+game_network = GameNetwork(game_raw_data)
 
-game_raw_data.to_csv('data/preprocessed_games_info.csv')
+category_tsne_df = game_network.category_tsne()
+mechanic_tsne_df = game_network.mechanic_tsne()
+
+game_raw_data = pd.concat([game_raw_data, category_tsne_df], axis=1)
+game_raw_data = pd.concat([game_raw_data, mechanic_tsne_df], axis=1)
+
+################################################################
+###########################drop game############################
+################################################################
+
+drop_games = ['"La Garde recule!"', \
+    '''"Oh My God! There\\'s An Axe In My Head." The Game of International Diplomacy ''', 
+    '"Scratch One Flat Top!"',
+    '#MyLife',
+    "(Come on) Let's Quiz Again",
+    "(Your Name Here) and the Argonauts",
+    '*Star',
+    '...and then, we held hands.',
+    '...und tschüss!',
+    '.hack//ENEMY',
+    ]
+
+droped_game_raw_data = game_raw_data[:]
+for i in range(game_raw_data_len):
+    if game_raw_data['primary'].iloc[i] in drop_games:
+        droped_game_raw_data = droped_game_raw_data.drop(index=i, axis=0)
+
+for i in range(len(droped_game_raw_data)):
+    if droped_game_raw_data['primary'].iloc[i] in drop_games:
+    # if '//' in game_raw_data['primary'].iloc[i]:
+        print(droped_game_raw_data['primary'].iloc[i])
+        
+droped_game_raw_data.reset_index(drop=True)
 
 
 
+
+
+droped_game_raw_data.to_csv('data/tsne_game_info4.csv')
