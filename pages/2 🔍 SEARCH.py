@@ -55,12 +55,12 @@ def select_game(input_dict):
         if button:
             st.session_state['button'] = i
         else:pass
-    
+
     if "button" in st.session_state.keys():
         result = st.session_state['button']
     else:
         result = None
-    
+  
     return result
 
 def local_css(file_name):
@@ -99,3 +99,4 @@ if session !=None:
     detailed_page(game_name,game_id,current_page='search')
 else:
     st.markdown("#### Press Game Name")
+

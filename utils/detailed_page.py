@@ -10,9 +10,11 @@ import plotly.express as px
 
 import nltk
 from nltk.corpus import stopwords
+
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
+
 
 from collections import Counter
 
@@ -22,6 +24,7 @@ import sys
 sys.path.append('./utils/')
 from get_from_api import review_data
 import requests
+
 
 def get_rating_bar_chart(Game_Name,Game_ID):
     # 확인 필요!!
@@ -50,6 +53,7 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     stops.add("played")
     stops.add("playing")
 
+
     no_stops = [word for word in preprocessed_words if not word in stops]
 
     #LEMMATIZING
@@ -61,7 +65,6 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     final_words = [word for word in lemmatized_words if len(word)>2]
 
     counted_words = Counter(final_words)
-
 
     if len(counted_words)>50:
         max_words = 50
@@ -77,8 +80,7 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     words_for_wc = []
     for keyword in most_common_words.keys():
         words_for_wc.append(dict(text=keyword, value=most_common_words[keyword]))
-
-    
+        
     wordcloud.visualize(words_for_wc, tooltip_data_fields={'text':'Word', 'value':'Word Count'}, per_word_coloring=False)
 
 
@@ -86,7 +88,7 @@ def get_wordcloud_chart(Game_ID, df,current_page):
 
 def detailed_page(Game_Name,Game_ID,current_page):
     # Input 데이터 확인 필요!!
-    df_game = pd.read_csv("./data/games.csv")
+    #df_game = pd.read_csv("./data/games.csv")
     dict_game = requests.get('http://127.0.0.1:5000/api?data-source=games&game-id='+str(Game_ID)).json()
 
 
@@ -98,6 +100,7 @@ def detailed_page(Game_Name,Game_ID,current_page):
     col1,col2 = st.columns([1,2])
 
     game_row = df_game[df_game["BGGId"]==Game_ID]
+
     with col1:
         st.image(dict_game["ImagePath"])
 
@@ -153,6 +156,7 @@ def detailed_page(Game_Name,Game_ID,current_page):
     else:
         st.markdown("### Rating Distribution")
         get_rating_bar_chart(Game_Name,Game_ID)
+
     
     st.markdown("### Review Wordcloud")
     df_review.dropna(subset=["comment"],inplace=True)
@@ -174,3 +178,4 @@ def make_popup(Game_Name,Game_ID,current_page):
     if modal.is_open():
         with modal.container():
             detailed_page(Game_Name,Game_ID,current_page)
+
