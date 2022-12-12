@@ -11,7 +11,7 @@ st.write("**Hello! Are you looking for a new board game? However, you don't know
 st.markdown("* * *")
 
 st.write("👥 Team 2 : 김현종, 박소형, 심재승, 유혜민, 조성배")
-st.write("You can find the source code in the [SNUDV_Team2 GitHub Repository](https://github.com)")
+st.write("You can find the source code in the [SNUDV_Team2 GitHub Repository](https://github.com/DMsjs/boardgame_recommendation_system)")
 
 landing_image=Image.open('landing image.png')
 st.image(landing_image)
