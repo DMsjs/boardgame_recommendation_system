@@ -85,8 +85,8 @@ def get_wordcloud_chart(Game_ID, df,current_page):
     for keyword in most_common_words.keys():
         words_for_wc.append(dict(text=keyword, value=most_common_words[keyword]))
         
-    wordcloud.visualize(words_for_wc, tooltip_data_fields={'text':'Word', 'value':'Word Count'}, per_word_coloring=False)
-
+    # wordcloud.visualize(words_for_wc, tooltip_data_fields={'text':'Word', 'value':'Word Count'}, per_word_coloring=False)
+    wordcloud.visualize(words_for_wc, per_word_coloring=False)
 
 
 
@@ -128,6 +128,8 @@ def detailed_page(Game_Name,Game_ID,current_page):
                 saved_df.reset_index(drop=True,inplace=True)
                 saved_df.to_csv("./pages/saved_results/saved_game.csv")
                 st.experimental_rerun()
+                save_button = False
+
 
         
         else:
@@ -137,6 +139,7 @@ def detailed_page(Game_Name,Game_ID,current_page):
                 saved_df.reset_index(drop=True,inplace=True)
                 saved_df.to_csv("./pages/saved_results/saved_game.csv")
                 st.experimental_rerun()
+                save_button = False
 
 
 
